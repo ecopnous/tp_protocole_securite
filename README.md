@@ -31,9 +31,9 @@ L'application met l'accent sur la sécurité des utilisateurs et des données à
 
 | Membre | Rôle |
 |---|---|
-| **Ecopnous Banzuzi** | Développement Backend, sécurité, authentification, base de données et déploiement |
-| **Ariel Tshibanda** | Développement, intégration, tests et documentation |
-
+| **Ecopnous Banzuzi** |
+| **Ariel Tshibanda**  |
+| **Symphorien Tshimanga** |
 ---
 
 # 🎯 Objectifs du projet
