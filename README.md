@@ -29,8 +29,8 @@ L'application met l'accent sur la sécurité des utilisateurs et des données à
 
 # 👥 Membres du groupe
 
-| Membre | Rôle |
-|---|---|
+| Membre |
+|---|
 | **Ecopnous Banzuzi** |
 | **Ariel Tshibanda**  |
 | **Symphorien Tshimanga** |
