@@ -1,177 +1,90 @@
-<x-layouts::app :title="__('Dashboard')">
-    <div class="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 lg:px-6">
-        <div class="mx-auto max-w-7xl space-y-6">
-            @if (session('error'))
-                <div class="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 shadow-lg shadow-rose-900/20">
-                    {{ session('error') }}
+<x-layouts::app :title="__('Simulation Zero Trust')">
+    <main class="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl space-y-8">
+            <section class="relative overflow-hidden rounded-[2rem] border border-cyan-400/20 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.15),transparent_32%),linear-gradient(135deg,#0f172a_0%,#020617_80%)] p-7 shadow-2xl shadow-cyan-950/20 sm:p-10">
+                <div class="relative z-10 max-w-3xl">
+                    <p class="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">TP Protocole · laboratoire de sécurité</p>
+                    <h1 class="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Simulation Zero Trust</h1>
+                    <p class="mt-4 max-w-2xl text-base leading-7 text-slate-300">
+                        N’accordez jamais la confiance par défaut. Évaluez chaque demande selon l’identité, l’appareil,
+                        l’authentification, le risque et l’état de la session.
+                    </p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-medium">
+                        <span class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-cyan-200">6 scénarios interactifs</span>
+                        <span class="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1.5 text-slate-300">Décision par défaut : refuser</span>
+                        <span class="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1.5 text-slate-300">Réévaluation continue</span>
+                    </div>
+                </div>
+            </section>
+
+            @if ($errors->any())
+                <div role="alert" class="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-200">
+                    {{ $errors->first() }}
                 </div>
             @endif
 
-            <div class="flex flex-wrap items-center gap-3 pb-2">
-                <a href="{{ route('dashboard') }}" class="rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-2 text-sm font-medium text-sky-200 {{ request()->routeIs('dashboard') ? 'shadow-[0_0_18px_rgba(56,189,248,0.18)]' : '' }}">
-                    User
-                </a>
-                <a href="{{ route('admin.dashboard') }}" class="rounded-full border {{ auth()->user()?->isAdmin() ? 'border-violet-500/30 bg-violet-500/10 text-violet-200' : 'border-slate-700 bg-slate-800/70 text-slate-300' }} px-4 py-2 text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'shadow-[0_0_18px_rgba(167,139,250,0.18)]' : '' }}">
-                    Admin
-                </a>
-            </div>
-
-            <div class="relative overflow-hidden rounded-[28px] border border-sky-500/20 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(34,211,238,0.14),transparent_30%),linear-gradient(135deg,#0f172a_0%,#111827_35%,#020617_100%)] p-6 shadow-[0_30px_80px_-30px_rgba(14,165,233,0.35)] sm:p-8">
-                <div class="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(148,163,184,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.07)_1px,transparent_1px)] [background-size:26px_26px]"></div>
-
-                <div class="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                    <div class="space-y-4">
-                        <div class="inline-flex items-center gap-2 rounded-full border border-sky-400/25 bg-sky-500/10 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.22em] text-sky-200">
-                            <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]"></span>
-                            Sécurité active
-                        </div>
+            @if ($simulationResult)
+                <section id="simulation-result" aria-live="polite" class="rounded-3xl border {{ $simulationResult['allowed'] ? 'border-emerald-400/30 bg-emerald-400/[0.06]' : 'border-rose-400/30 bg-rose-400/[0.06]' }} p-6 shadow-xl sm:p-8">
+                    <div class="flex flex-wrap items-start justify-between gap-4">
                         <div>
-                            <p class="text-sm uppercase tracking-[0.22em] text-slate-300">TP Protocole</p>
-                            <h1 class="mt-2 text-3xl font-semibold tracking-tight text-white md:text-4xl">Tableau de bord</h1>
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Résultat de la simulation · {{ $simulationResult['resource'] }}</p>
+                            <h2 class="mt-2 text-2xl font-semibold text-white">{{ $simulationResult['title'] }}</h2>
                         </div>
+                        <span class="rounded-full px-3 py-1.5 text-sm font-semibold {{ $simulationResult['allowed'] ? 'bg-emerald-400/10 text-emerald-300' : 'bg-rose-400/10 text-rose-300' }}">
+                            {{ $simulationResult['decision'] }}
+                        </span>
                     </div>
+                    <p class="mt-4 max-w-3xl leading-7 text-slate-300">{{ $simulationResult['explanation'] }}</p>
+                    <div class="mt-5 rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">Action de politique recommandée</p>
+                        <p class="mt-2 text-sm leading-6 text-slate-200">{{ $simulationResult['action'] }}</p>
+                    </div>
+                    <ul class="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                        @foreach ($simulationResult['checks'] as $check)
+                            <li class="flex items-center gap-2 rounded-xl border border-white/5 bg-slate-950/40 px-3 py-2 text-sm {{ $check['passed'] ? 'text-emerald-200' : 'text-rose-200' }}">
+                                <span aria-hidden="true">{{ $check['passed'] ? '✓' : '×' }}</span>
+                                {{ $check['label'] }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
 
-                    <div class="flex flex-wrap items-center gap-3">
-                        <button class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10">
-                            Exporter
-                        </button>
-                        <button class="rounded-xl bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/30 transition hover:bg-sky-400">
-                            Nouveau protocole
-                        </button>
+            <section aria-labelledby="scenario-heading">
+                <div class="mb-5 flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Choisissez une situation</p>
+                        <h2 id="scenario-heading" class="mt-2 text-2xl font-semibold text-white">Scénarios de contrôle d’accès</h2>
                     </div>
-                </div>
-            </div>
-
-            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/30">
-                    <div class="flex items-center justify-between text-sm text-slate-400">
-                        <span>Alertes</span>
-                        <span class="rounded-full bg-rose-500/10 px-2 py-1 text-[10px] font-medium text-rose-300">+12%</span>
-                    </div>
-                    <p class="mt-4 text-3xl font-semibold text-white">24</p>
-                    <p class="mt-2 text-sm text-slate-400">Événements à traiter</p>
-                </div>
-
-                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/30">
-                    <div class="flex items-center justify-between text-sm text-slate-400">
-                        <span>Utilisateurs</span>
-                        <span class="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-300">+8%</span>
-                    </div>
-                    <p class="mt-4 text-3xl font-semibold text-white">1.8k</p>
-                    <p class="mt-2 text-sm text-slate-400">Comptes actifs</p>
+                    <p class="max-w-xl text-sm leading-6 text-slate-400">Chaque exécution évalue les mêmes contrôles et explique la décision, le signal déterminant et la réponse recommandée.</p>
                 </div>
 
-                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/30">
-                    <div class="flex items-center justify-between text-sm text-slate-400">
-                        <span>Authentification</span>
-                        <span class="rounded-full bg-sky-500/10 px-2 py-1 text-[10px] font-medium text-sky-300">99.9%</span>
-                    </div>
-                    <p class="mt-4 text-3xl font-semibold text-white">96%</p>
-                    <p class="mt-2 text-sm text-slate-400">Taux de réussite</p>
+                <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($scenarios as $scenarioId => $scenario)
+                        <article class="flex h-full flex-col rounded-3xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg shadow-slate-950/30 transition hover:border-cyan-400/30">
+                            <div class="flex items-start justify-between gap-3">
+                                <span class="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 text-sm font-semibold text-cyan-200">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                                <span class="rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-[11px] text-slate-400">{{ $scenario['resource'] }}</span>
+                            </div>
+                            <h3 class="mt-5 text-lg font-semibold text-white">{{ $scenario['title'] }}</h3>
+                            <p class="mt-2 flex-1 text-sm leading-6 text-slate-400">{{ $scenario['summary'] }}</p>
+                            <form method="POST" action="{{ route('dashboard.simulate') }}" class="mt-5">
+                                @csrf
+                                <input type="hidden" name="scenario" value="{{ $scenarioId }}">
+                                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/40 hover:bg-cyan-400/15 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-900">
+                                    Simuler ce scénario <span aria-hidden="true">→</span>
+                                </button>
+                            </form>
+                        </article>
+                    @endforeach
                 </div>
+            </section>
 
-                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/30">
-                    <div class="flex items-center justify-between text-sm text-slate-400">
-                        <span>Protection</span>
-                        <span class="rounded-full bg-violet-500/10 px-2 py-1 text-[10px] font-medium text-violet-300">Secure</span>
-                    </div>
-                    <p class="mt-4 text-3xl font-semibold text-white">A+</p>
-                    <p class="mt-2 text-sm text-slate-400">Score global</p>
-                </div>
-            </div>
-
-            <div class="grid gap-6 xl:grid-cols-[1.5fr_0.9fr]">
-                <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/30 sm:p-6">
-                    <div class="mb-5 flex items-center justify-between">
-                        <div>
-                            <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Activité</p>
-                            <h2 class="mt-2 text-xl font-semibold text-white">Surveillance des protocoles</h2>
-                        </div>
-                        <span class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">En ligne</span>
-                    </div>
-
-                    <div class="space-y-5">
-                        <div class="rounded-2xl border border-slate-800 bg-slate-950/80 p-4">
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <p class="text-sm font-medium text-slate-200">Authentification MFA</p>
-                                    <p class="mt-1 text-xs text-slate-400">Dernière synchronisation il y a 12 min</p>
-                                </div>
-                                <span class="text-xs font-medium text-emerald-300">Stable</span>
-                            </div>
-                            <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-800">
-                                <div class="h-full w-[84%] rounded-full bg-gradient-to-r from-emerald-400 via-sky-400 to-cyan-300"></div>
-                            </div>
-                        </div>
-
-                        <div class="rounded-2xl border border-slate-800 bg-slate-950/80 p-4">
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <p class="text-sm font-medium text-slate-200">Audit des accès</p>
-                                    <p class="mt-1 text-xs text-slate-400">3 anomalies détectées ce jour</p>
-                                </div>
-                                <span class="text-xs font-medium text-amber-300">À surveiller</span>
-                            </div>
-                            <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-800">
-                                <div class="h-full w-[68%] rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-300"></div>
-                            </div>
-                        </div>
-
-                        <div class="rounded-2xl border border-slate-800 bg-slate-950/80 p-4">
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <p class="text-sm font-medium text-slate-200">Protection réseau</p>
-                                    <p class="mt-1 text-xs text-slate-400">Aucune intrusion détectée</p>
-                                </div>
-                                <span class="text-xs font-medium text-sky-300">Régulier</span>
-                            </div>
-                            <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-800">
-                                <div class="h-full w-[92%] rounded-full bg-gradient-to-r from-sky-400 via-cyan-400 to-blue-500"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/30">
-                        <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Système</p>
-                        <h3 class="mt-3 text-xl font-semibold text-white">Statut des protocoles</h3>
-
-                        <div class="mt-5 space-y-4">
-                            <div class="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2.5">
-                                <span class="text-sm text-slate-200">Firewall</span>
-                                <span class="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-300">OK</span>
-                            </div>
-                            <div class="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2.5">
-                                <span class="text-sm text-slate-200">MFA</span>
-                                <span class="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-300">OK</span>
-                            </div>
-                            <div class="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/70 px-3 py-2.5">
-                                <span class="text-sm text-slate-200">Historique</span>
-                                <span class="rounded-full bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-300">Audit</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-slate-950/30">
-                        <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Accès rapide</p>
-                        <div class="mt-4 space-y-3">
-                            <button class="flex w-full items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3 text-left text-sm text-slate-200 transition hover:border-sky-500/40 hover:bg-slate-900">
-                                <span>Gestion des comptes</span>
-                                <span class="text-sky-300">→</span>
-                            </button>
-                            <button class="flex w-full items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3 text-left text-sm text-slate-200 transition hover:border-sky-500/40 hover:bg-slate-900">
-                                <span>Rapports de sécurité</span>
-                                <span class="text-sky-300">→</span>
-                            </button>
-                            <button class="flex w-full items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/80 px-3 py-3 text-left text-sm text-slate-200 transition hover:border-sky-500/40 hover:bg-slate-900">
-                                <span>Paramètres du système</span>
-                                <span class="text-sky-300">→</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <p class="rounded-2xl border border-amber-400/15 bg-amber-400/[0.04] px-5 py-4 text-sm leading-6 text-amber-100/80">
+                <strong class="font-semibold text-amber-200">Mode pédagogique :</strong>
+                les signaux sont des données fictives. Cette page n’interroge ni appareil, ni fournisseur d’identité, ni réseau,
+                et ne bloque ou ne révoque aucune session réelle.
+            </p>
         </div>
-    </div>
+    </main>
 </x-layouts::app>

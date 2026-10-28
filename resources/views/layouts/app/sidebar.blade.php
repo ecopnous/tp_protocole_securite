@@ -13,22 +13,18 @@
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Platform')" class="grid">
                     <flux:sidebar.item class="text-slate-300 hover:bg-slate-800/70 hover:text-white data-[current=true]:bg-sky-500/10 data-[current=true]:text-sky-300" icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        {{ __('Labo & Simulation') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item class="text-slate-300 hover:bg-slate-800/70 hover:text-white data-[current=true]:bg-emerald-500/10 data-[current=true]:text-emerald-300" icon="shield-check" :href="route('zero-trust.index')" :current="request()->routeIs('zero-trust.*')" wire:navigate>
+                        {{ __('Centre de sécurité') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item class="text-slate-300 hover:bg-slate-800/70 hover:text-white data-[current=true]:bg-emerald-500/10 data-[current=true]:text-emerald-300" icon="cog" :href="route('zero-trust.index')" :current="request()->routeIs('password.*')" wire:navigate>
+                        {{ __('Mot de passe') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
             <flux:spacer />
-
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
-
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>
