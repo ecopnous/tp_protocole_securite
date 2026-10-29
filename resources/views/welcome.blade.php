@@ -3,10 +3,10 @@
     <head>
         @include('partials.head', ['title' => __('TP Protocole')])
     </head>
-    <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
-        <div class="relative isolate overflow-hidden">
-            <div class="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.18),transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(99,102,241,0.16),transparent_30%),linear-gradient(135deg,#020817_0%,#0f172a_35%,#111827_100%)]"></div>
-            <div class="absolute inset-0 -z-10 opacity-30 [background-image:linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] [background-size:52px_52px]"></div>
+    <body class="landing-surface min-h-screen antialiased">
+        <div class="landing-shell relative isolate overflow-hidden">
+            <div class="landing-backdrop absolute inset-0 -z-20"></div>
+            <div class="landing-grid absolute inset-0 -z-10 opacity-30"></div>
 
             <header class="mx-auto max-w-6xl px-4 pt-6 sm:px-6 lg:px-8">
                 <nav class="flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-3 shadow-[0_20px_60px_-20px_rgba(14,165,233,0.45)] backdrop-blur-md">
@@ -22,6 +22,16 @@
 
                     @if (Route::has('login'))
                         <div class="flex items-center gap-3">
+                            <button
+                                type="button"
+                                class="landing-theme-toggle inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition"
+                                aria-label="Changer le thème"
+                                x-data
+                                x-on:click="$flux.appearance = $flux.appearance === 'dark' ? 'light' : 'dark'"
+                            >
+                                <span aria-hidden="true" x-text="$flux.appearance === 'dark' ? '☀' : '☾'"></span>
+                                <span class="hidden sm:inline" x-text="$flux.appearance === 'dark' ? 'Clair' : 'Sombre'"></span>
+                            </button>
                             @auth
                                 <a href="{{ route('dashboard') }}" class="inline-flex items-center rounded-full border border-sky-400/40 bg-sky-500/10 px-4 py-2 text-sm font-medium text-sky-100 transition hover:bg-sky-500/20">
                                     Dashboard
@@ -46,15 +56,15 @@
                 <section class="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
                     <div class="space-y-8">
                         <div class="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.22em] text-cyan-200">
-                            <span class="h-2 w-2 rounded-full bg-cyan-300"></span>
+                            {{-- <span class="h-2 w-2 rounded-full bg-cyan-300"></span> --}}
                             Cours de protocole de sécurité
                         </div>
 
                         <div class="space-y-5">
                             <h1 class="max-w-xl text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
-                                TP Protocole
+                                TP Protocole de
                                 <span class="block bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-300 bg-clip-text text-transparent">
-                                    sécurité et confiance numérique
+                                    Sécurité : Zero Trust
                                 </span>
                             </h1>
 
@@ -198,5 +208,6 @@
                 </div>
             </footer>
         </div>
+        @fluxScripts
     </body>
 </html>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\BrowserDetails;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -27,30 +28,55 @@ class SecurityCenterController extends Controller
                 ->where('user_id', $user->getKey())
                 ->orderByDesc('last_activity')
                 ->get()
-                ->map(fn (object $session): array => [
-                    'current' => $session->id === $request->session()->getId(),
-                    'ip_address' => $session->ip_address ?: 'Adresse inconnue',
-                    'user_agent' => Str::limit($session->user_agent ?: 'Navigateur inconnu', 110),
-                    'last_activity' => Carbon::createFromTimestamp((int) $session->last_activity)->diffForHumans(),
-                ])
+                ->map(function (object $session) use ($request): array {
+                    $details = app(BrowserDetails::class)->fromUserAgent($session->user_agent);
+
+                    return [
+                        'current' => $session->id === $request->session()->getId(),
+                        'ip_address' => $session->ip_address ?: 'Adresse inconnue',
+                        'user_agent' => Str::limit($session->user_agent ?: 'Navigateur inconnu', 180),
+                        'browser' => $details['browser'],
+                        'platform' => $details['platform'],
+                        'device' => $details['device'],
+                        'last_activity' => Carbon::createFromTimestamp((int) $session->last_activity)->diffForHumans(),
+                    ];
+                })
             : collect();
 
         $eventLabels = [
             'protected_access_denied_mfa' => 'Accès protégé refusé · MFA absent',
             'protected_workspace_accessed' => 'Zone protégée consultée',
             'other_sessions_revoked' => 'Autres sessions révoquées',
+            'device_trusted' => 'Nouvel appareil enregistré',
+            'device_retrusted' => 'Appareil réenregistré après vérification',
+            'device_login' => 'Connexion depuis un appareil enregistré',
+            'device_revoked' => 'Appareil révoqué',
+            'device_reported_not_me' => 'Connexion signalée comme inconnue',
+            'device_confirmed_by_email' => 'Nouvel appareil confirmé par email',
         ];
 
         $events = DB::table('zero_trust_events')
             ->where('user_id', $user->getKey())
             ->latest('created_at')
-            ->limit(10)
             ->get()
             ->map(function (object $event) use ($eventLabels): object {
                 $event->event_label = $eventLabels[$event->event_type] ?? 'Événement de sécurité';
 
                 return $event;
-            });
+            })
+            ->merge(DB::table('trusted_device_events')
+                ->where('user_id', $user->getKey())
+                ->latest('created_at')
+                ->get()
+                ->map(function (object $event) use ($eventLabels): object {
+                    $event->event_label = $eventLabels[$event->event_type] ?? 'Événement sur un appareil';
+                    $event->description = $event->event_label;
+
+                    return $event;
+                }))
+            ->sortByDesc('created_at')
+            ->take(10)
+            ->values();
 
         return view('zero-trust.index', [
             'user' => $user,
@@ -58,6 +84,10 @@ class SecurityCenterController extends Controller
             'passkeyCount' => $user->passkeys()->count(),
             'canManageSessions' => $canManageSessions,
             'sessions' => $sessions,
+            'devices' => DB::table('trusted_devices')
+                ->where('user_id', $user->getKey())
+                ->orderByDesc('last_seen_at')
+                ->get(),
             'events' => $events,
         ]);
     }
@@ -71,9 +101,36 @@ class SecurityCenterController extends Controller
             return to_route('zero-trust.index')->with('error', 'La gestion des sessions exige le pilote de session database.');
         }
 
-        $revokedCount = DB::connection($sessionConnection)->table($sessionTable)
+        $otherSessionIds = DB::connection($sessionConnection)->table($sessionTable)
             ->where('user_id', $request->user()->getAuthIdentifier())
             ->where('id', '!=', $request->session()->getId())
+            ->pluck('id');
+
+        $revokedDevices = DB::table('trusted_devices')
+            ->where('user_id', $request->user()->getAuthIdentifier())
+            ->whereIn('current_session_id', $otherSessionIds)
+            ->get();
+
+        foreach ($revokedDevices as $device) {
+            DB::table('trusted_devices')->where('id', $device->id)->update([
+                'status' => 'revoked',
+                'revocation_reason' => 'other_sessions_revoked',
+                'updated_at' => now(),
+            ]);
+            DB::table('trusted_device_events')->insert([
+                'user_id' => $request->user()->getAuthIdentifier(),
+                'trusted_device_id' => $device->id,
+                'event_type' => 'device_revoked',
+                'status' => 'revoked',
+                'ip_address' => $device->ip_address,
+                'user_agent' => $device->user_agent,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $revokedCount = DB::connection($sessionConnection)->table($sessionTable)
+            ->whereIn('id', $otherSessionIds)
             ->delete();
 
         $this->recordEvent(

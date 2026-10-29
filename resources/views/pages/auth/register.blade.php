@@ -1,6 +1,6 @@
 <x-layouts::auth :title="__('Register')">
     <div class="grid overflow-hidden lg:grid-cols-[1.06fr_0.94fr]">
-        <div class="relative overflow-hidden bg-slate-950 p-8 text-white md:p-10 lg:p-12">
+        <div class="auth-promo relative overflow-hidden p-8 text-white md:p-10 lg:p-12">
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.36),transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(34,211,238,0.28),transparent_34%)]"></div>
             <div class="absolute inset-0 bg-[linear-gradient(135deg,rgba(15,23,42,0.12),rgba(15,23,42,0.82))]"></div>
 

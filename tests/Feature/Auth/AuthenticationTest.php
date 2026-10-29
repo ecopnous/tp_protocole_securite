@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Fortify\Features;
 
 test('login screen can be rendered', function () {
@@ -9,7 +10,8 @@ test('login screen can be rendered', function () {
     $response->assertOk();
 });
 
-test('users can authenticate using the login screen', function () {
+test('unknown browsers must verify their email after password sign in', function () {
+    Mail::fake();
     $user = User::factory()->create();
 
     $response = $this->post(route('login.store'), [
@@ -19,9 +21,13 @@ test('users can authenticate using the login screen', function () {
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+        ->assertRedirect(route('security.devices.pending'));
 
-    $this->assertAuthenticated();
+    $this->assertGuest();
+    $this->assertDatabaseHas('device_login_challenges', [
+        'user_id' => $user->id,
+        'status' => 'pending',
+    ]);
 });
 
 test('users can not authenticate with invalid password', function () {

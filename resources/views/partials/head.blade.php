@@ -11,13 +11,5 @@
 
 @fonts
 
-<script>
-    (() => {
-        const root = document.documentElement;
-        root.classList.add('dark');
-        root.style.colorScheme = 'dark';
-    })();
-</script>
-
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance

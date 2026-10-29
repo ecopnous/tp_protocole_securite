@@ -1,7 +1,7 @@
 <x-layouts::app :title="__('Simulation Zero Trust')">
-    <main class="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
+    <main class="app-surface min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-7xl space-y-8">
-            <section class="relative overflow-hidden rounded-[2rem] border border-cyan-400/20 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.15),transparent_32%),linear-gradient(135deg,#0f172a_0%,#020617_80%)] p-7 shadow-2xl shadow-cyan-950/20 sm:p-10">
+            <section class="app-hero relative overflow-hidden rounded-[2rem] border border-cyan-400/20 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.15),transparent_32%),linear-gradient(135deg,#0f172a_0%,#020617_80%)] p-7 shadow-2xl shadow-cyan-950/20 sm:p-10">
                 <div class="relative z-10 max-w-3xl">
                     <p class="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">TP Protocole · laboratoire de sécurité</p>
                     <h1 class="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Simulation Zero Trust</h1>

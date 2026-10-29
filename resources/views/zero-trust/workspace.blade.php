@@ -1,9 +1,9 @@
 <x-layouts::app :title="__('Zone protégée')">
-    <main class="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
+    <main class="app-surface min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-5xl space-y-6">
             <a href="{{ route('zero-trust.index') }}" class="inline-flex items-center gap-2 text-sm font-medium text-cyan-300 hover:text-cyan-200">← Retour au centre de sécurité</a>
 
-            <section class="rounded-[2rem] border border-emerald-400/25 bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.13),transparent_34%),linear-gradient(135deg,#0f172a_0%,#020617_82%)] p-7 sm:p-10">
+            <section class="app-hero rounded-[2rem] border border-emerald-400/25 bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.13),transparent_34%),linear-gradient(135deg,#0f172a_0%,#020617_82%)] p-7 sm:p-10">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Accès accordé après vérification</p>
                 <h1 class="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Zone protégée</h1>
                 <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-300">Votre compte possède un MFA confirmé et votre mot de passe a été récemment confirmé. Cette route a également enregistré l’accès dans le journal de sécurité.</p>

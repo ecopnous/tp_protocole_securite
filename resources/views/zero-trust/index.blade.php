@@ -1,7 +1,7 @@
 <x-layouts::app :title="__('Centre de sécurité')">
-    <main class="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
+    <main class="app-surface min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-7xl space-y-8">
-            <section class="rounded-[2rem] border border-emerald-400/20 bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.14),transparent_34%),linear-gradient(135deg,#0f172a_0%,#020617_82%)] p-7 shadow-2xl shadow-emerald-950/20 sm:p-10">
+            <section class="app-hero rounded-[2rem] border border-emerald-400/20 bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.14),transparent_34%),linear-gradient(135deg,#0f172a_0%,#020617_82%)] p-7 shadow-2xl shadow-emerald-950/20 sm:p-10">
                 <p class="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Contrôles réels de votre compte</p>
                 <h1 class="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Centre de sécurité</h1>
                 <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">
@@ -90,8 +90,36 @@
                                         <span class="text-sm font-semibold text-slate-100">{{ $session['current'] ? 'Session actuelle' : 'Autre session' }}</span>
                                         <span class="text-xs text-slate-500">{{ $session['last_activity'] }}</span>
                                     </div>
-                                    <p class="mt-2 text-xs text-slate-400">{{ $session['ip_address'] }}</p>
-                                    <p class="mt-1 break-words text-xs leading-5 text-slate-500">{{ $session['user_agent'] }}</p>
+                                    <p class="mt-2 text-sm text-slate-300">{{ $session['device'] }} · {{ $session['browser'] }}</p>
+                                    <p class="mt-1 text-xs text-slate-400">{{ $session['platform'] }} · {{ $session['ip_address'] }}</p>
+                                    <details class="mt-2">
+                                        <summary class="cursor-pointer text-xs text-slate-500">Informations du navigateur reçues</summary>
+                                        <p class="mt-1 break-words text-xs leading-5 text-slate-500">{{ $session['user_agent'] }}</p>
+                                    </details>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </article>
+
+                <article class="rounded-3xl border border-slate-800 bg-slate-900/70 p-6 sm:p-7">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Appareils mémorisés</p>
+                    <h2 class="mt-3 text-xl font-semibold text-white">Appareils et historique</h2>
+                    @if ($devices->isEmpty())
+                        <p class="mt-5 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-400">Aucun appareil n’a encore été enregistré.</p>
+                    @else
+                        <ul class="mt-5 space-y-3">
+                            @foreach ($devices as $device)
+                                <li class="rounded-2xl border {{ $device->status === 'trusted' ? 'border-emerald-400/20 bg-emerald-400/[0.04]' : 'border-slate-800 bg-slate-950/60' }} p-4">
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <span class="text-sm font-semibold text-slate-100">{{ $device->device }} · {{ $device->browser }}</span>
+                                        <span class="text-xs font-medium {{ $device->status === 'trusted' ? 'text-emerald-300' : 'text-rose-300' }}">{{ $device->status === 'trusted' ? 'Enregistré' : 'Révoqué' }}</span>
+                                    </div>
+                                    <p class="mt-2 text-xs text-slate-400">{{ $device->platform }} · {{ $device->ip_address ?: 'Adresse inconnue' }}</p>
+                                    <p class="mt-1 text-xs text-slate-500">Dernière activité {{ $device->last_seen_at ? \Illuminate\Support\Carbon::parse($device->last_seen_at)->diffForHumans() : 'inconnue' }}</p>
+                                    @if ($device->revocation_reason)
+                                        <p class="mt-1 text-xs text-rose-300">État : {{ $device->revocation_reason === 'reported_not_me' ? 'signalé comme inconnu' : 'sessions révoquées' }}</p>
+                                    @endif
                                 </li>
                             @endforeach
                         </ul>

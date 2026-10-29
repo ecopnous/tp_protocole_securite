@@ -96,6 +96,20 @@ test('users can revoke other database sessions after confirming their password',
         'payload' => '{}',
         'last_activity' => now()->timestamp,
     ]);
+    DB::table('trusted_devices')->insert([
+        'user_id' => $user->id,
+        'token_hash' => hash('sha256', 'revocable-device-token'),
+        'browser' => 'Firefox 132',
+        'platform' => 'Linux',
+        'device' => 'Ordinateur',
+        'user_agent' => 'Firefox/132.0',
+        'ip_address' => '192.0.2.15',
+        'status' => 'trusted',
+        'current_session_id' => 'revocable-session',
+        'last_seen_at' => now(),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
 
     $this->actingAs($user)
         ->withSession(['auth.password_confirmed_at' => now()->timestamp])
@@ -107,5 +121,15 @@ test('users can revoke other database sessions after confirming their password',
     $this->assertDatabaseHas('zero_trust_events', [
         'user_id' => $user->id,
         'event_type' => 'other_sessions_revoked',
+    ]);
+    $this->assertDatabaseHas('trusted_devices', [
+        'user_id' => $user->id,
+        'token_hash' => hash('sha256', 'revocable-device-token'),
+        'status' => 'revoked',
+    ]);
+    $this->assertDatabaseHas('trusted_device_events', [
+        'user_id' => $user->id,
+        'event_type' => 'device_revoked',
+        'status' => 'revoked',
     ]);
 });

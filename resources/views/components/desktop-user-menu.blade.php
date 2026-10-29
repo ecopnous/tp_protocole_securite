@@ -22,9 +22,9 @@
             <flux:menu.item :href="route('profile.edit')" icon="user" wire:navigate>
                 {{ __('Profil') }}
             </flux:menu.item>
-            <flux:sidebar.item class="text-slate-300 hover:bg-slate-800/70 hover:text-white data-[current=true]:bg-emerald-500/10 data-[current=true]:text-emerald-300" icon="shield-check" :href="route('zero-trust.index')" :current="request()->routeIs('appearance.*')" wire:navigate>
+            <flux:menu.item :href="route('appearance.edit')" icon="sun" :current="request()->routeIs('appearance.edit')" wire:navigate>
                 {{ __('Apparence') }}
-            </flux:sidebar.item>
+            </flux:menu.item>
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
                 <flux:menu.item

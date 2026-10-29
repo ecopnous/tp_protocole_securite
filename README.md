@@ -2,8 +2,6 @@
 
 ## Présentation
 
-Le tableau de bord de démonstration a été remplacé par un laboratoire interactif qui montre comment une politique Zero Trust peut évaluer une demande d’accès. L’utilisateur choisit un scénario, le serveur vérifie les signaux simulés, puis affiche une décision, les contrôles réussis ou échoués et une action recommandée.
-
 Le principe présenté est **« ne jamais faire confiance par défaut, toujours vérifier »**. Une identité authentifiée ne suffit pas à elle seule : l’accès dépend aussi de l’appareil, du MFA, du risque et de l’état de la session. La règle de démonstration est le refus par défaut si un contrôle requis échoue.
 
 > **Limite importante :** ce laboratoire est pédagogique. Il utilise des signaux prédéfinis dans le code. Il ne contacte aucun fournisseur d’identité, agent de gestion d’appareils, service de renseignement sur les risques ou SIEM. Les décisions affichées ne bloquent ni ne révoquent un accès réel et ne constituent pas une protection de production.

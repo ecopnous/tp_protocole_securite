@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-slate-950 text-slate-100">
-        <flux:header container class="border-b border-slate-800 bg-slate-950/90 text-slate-100 backdrop-blur-xl">
+    <body class="app-theme min-h-screen">
+        <flux:header container class="app-topbar border-b border-slate-800 bg-slate-950/90 text-slate-100 backdrop-blur-xl">
             <flux:sidebar.toggle class="lg:hidden mr-2" icon="bars-2" inset="left" />
 
             <x-app-logo href="{{ route('dashboard') }}" wire:navigate />
@@ -82,3 +82,4 @@
         @fluxScripts
     </body>
 </html>
+

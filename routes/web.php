@@ -1,11 +1,21 @@
 <?php
 
 use App\Http\Controllers\SecurityCenterController;
+use App\Http\Controllers\SecurityDeviceController;
 use App\Http\Controllers\ZeroTrustSimulationController;
 use App\Http\Middleware\EnsureMfaConfigured;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+
+Route::get('security/device-verification', [SecurityDeviceController::class, 'pending'])
+    ->name('security.devices.pending');
+Route::get('security/devices/{challenge}/{token}/confirm', [SecurityDeviceController::class, 'confirmation'])
+    ->name('security.devices.confirm');
+Route::post('security/devices/{challenge}/{token}/confirm', [SecurityDeviceController::class, 'confirm']);
+Route::get('security/devices/{challenge}/{token}/deny', [SecurityDeviceController::class, 'confirmation'])
+    ->name('security.devices.deny');
+Route::post('security/devices/{challenge}/{token}/deny', [SecurityDeviceController::class, 'deny']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [ZeroTrustSimulationController::class, 'index'])->name('dashboard');
